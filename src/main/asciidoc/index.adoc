@@ -118,6 +118,23 @@ The Vert.x integration is primarily done using the {@link io.vertx.junit5.VertxE
 NOTE: The `Vertx` instance is not clustered and has the default configuration.
 If you need something else then just don't use injection on that parameter and prepare a `Vertx` object by yourself.
 
+[WARNING]
+====
+In Vert.x 5, several client resources (e.g. `HttpClient`, `WebClient`) rely on the JVM's
+link:https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/ref/Cleaner.html[Cleaner]
+mechanism for leak cleanup (older versions relied on finalizers).
+
+This means that if a client becomes *unreachable*, the JVM may reclaim it and Vert.x may close
+its underlying pool *non-deterministically*, potentially while an asynchronous operation is still in progress.
+
+In tests, this can happen when a client is created as a local variable and no strong reference is kept
+until the async callbacks complete. This can lead to intermittent failures such as `VertxException: Pool closed`,
+especially in CI where GC behavior may differ.
+
+To avoid this, keep clients strongly reachable for the duration of the test (e.g. store them in a field),
+and prefer explicit `close()` when appropriate.
+====
+
 The test is automatically wrapped around the {@link io.vertx.junit5.VertxTestContext} instance lifecycle, so you don't need to insert {@link io.vertx.junit5.VertxTestContext#awaitCompletion} calls yourself:
 
 [source,java]

@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(VertxExtension.class)
 public class Examples {
 
+  // Keep as a field to avoid premature GC/Cleaner cleanup during async operations (Vert.x 5)
   HttpClient client;
 
   class ATest {
@@ -161,6 +162,7 @@ public class Examples {
     @ExtendWith(VertxExtension.class)
     class SomeTest {
 
+      // Keep as a field to avoid premature GC/Cleaner cleanup during async operations (Vert.x 5)
       HttpClient client;
 
       @Test
@@ -197,6 +199,7 @@ public class Examples {
         vertx.deployVerticle(new HttpServerVerticle()).onComplete(testContext.succeedingThenComplete());
       }
 
+      // Keep as a field to avoid premature GC/Cleaner cleanup during async operations (Vert.x 5)
       HttpClient client;
 
       // Repeat this test 3 times
